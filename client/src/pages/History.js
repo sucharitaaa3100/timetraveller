@@ -3,15 +3,12 @@ import Navbar from '../components/Navbar';
 import axios from 'axios';
 
 function History() {
-  const [selectedDate, setSelectedDate] = useState('');
+  const [month, setMonth] = useState('');
+  const [day, setDay] = useState('');
   const [events, setEvents] = useState([]);
 
   const fetchHistory = async () => {
-    if (!selectedDate) return;
-
-    const date = new Date(selectedDate);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
+    if (!month || !day) return;
 
     try {
       const res = await axios.get(
@@ -34,7 +31,6 @@ function History() {
       link: event.pages?.[0]?.content_urls?.desktop?.page || '',
     };
 
-    // Avoid duplicates
     const alreadySaved = current.some((e) => e.text === newItem.text && e.year === newItem.year);
     if (!alreadySaved) {
       localStorage.setItem('savedItems', JSON.stringify([...current, newItem]));
@@ -49,23 +45,47 @@ function History() {
       <Navbar />
       <div className="container mt-5 text-center">
         <h2 className="mb-4">📜 Discover Historical Events</h2>
-        <p className="lead">Pick a date to see what happened in history.</p>
+        <p className="lead">Select a month and day to see what happened in history.</p>
 
-        <div className="mt-4">
-          <input
-            type="date"
-            className="form-control w-50 mx-auto"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-          />
-          <button className="btn btn-primary mt-3" onClick={fetchHistory}>
+        <div className="mt-4 d-flex justify-content-center gap-2">
+          <select
+            className="form-select w-auto"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+          >
+            <option value="">Month</option>
+            {Array.from({ length: 12 }, (_, i) => (
+              <option key={i + 1} value={i + 1}>
+                {new Date(0, i).toLocaleString('default', { month: 'long' })}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="form-select w-auto"
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+          >
+            <option value="">Day</option>
+            {Array.from({ length: 31 }, (_, i) => (
+              <option key={i + 1} value={i + 1}>{i + 1}</option>
+            ))}
+          </select>
+
+          <button className="btn btn-primary" onClick={fetchHistory}>
             Search
           </button>
         </div>
 
         {events.length > 0 && (
           <div className="mt-5 text-start w-75 mx-auto">
-            <h4 className="mb-3">🕰 Events on {selectedDate}:</h4>
+            <h4 className="mb-3">
+              🕰 Events on {new Date(2020, month - 1, day).toLocaleDateString(undefined, {
+                month: 'long',
+                day: 'numeric'
+              })}
+              :
+            </h4>
             <ul className="list-group">
               {events.map((event, index) => (
                 <li key={index} className="list-group-item d-flex justify-content-between align-items-start">
