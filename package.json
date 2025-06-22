@@ -1,8 +1,0 @@
-{
-  "name": "time-traveler-fullstack",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "node server/index.js",
-    "build": "cd client && npm install && npm run build"
-  }
-}
