@@ -19,3 +19,12 @@ mongoose.connect(process.env.MONGO_URI)
     });
   })
   .catch((err) => console.log(' DB Connection Error:', err));
+
+  const path = require('path');
+
+// Serve React frontend in production
+app.use(express.static(path.join(__dirname, '../client/build')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
